@@ -4,7 +4,7 @@ import { getCallRecordings, getCallStatus, makeOutboundCall } from '../services/
 import type { OutboundCallOptions } from '../types/twilio.types';
 
 export async function initiateOutbound(req: Request, res: Response): Promise<void> {
-  const { to, from, twimlUrl, statusCallbackUrl, record } = req.body as OutboundCallOptions;
+  const { to, from, twimlUrl, statusCallbackUrl, record, nombre, correo } = req.body as OutboundCallOptions;
 
   if (!to) {
     res.status(400).json({ error: '"to" is required' });
@@ -12,7 +12,7 @@ export async function initiateOutbound(req: Request, res: Response): Promise<voi
   }
 
   try {
-    const call = await makeOutboundCall({ to, from, twimlUrl, statusCallbackUrl, record });
+    const call = await makeOutboundCall({ to, from, twimlUrl, statusCallbackUrl, record, nombre, correo });
     res.status(201).json(call);
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
