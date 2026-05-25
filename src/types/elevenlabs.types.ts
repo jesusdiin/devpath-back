@@ -4,6 +4,7 @@ export interface ElevenLabsInitMessage {
     agent?: { language?: string; prompt?: { prompt?: string }; first_message?: string };
     tts?: { optimize_streaming_latency?: number };
   };
+  dynamic_variables?: Record<string, string>;
 }
 
 export interface ElevenLabsAudioMessage {

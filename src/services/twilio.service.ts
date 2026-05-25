@@ -21,10 +21,14 @@ function mapCall(call: Awaited<ReturnType<typeof twilioClient.calls.create>>): C
 }
 
 export async function makeOutboundCall(options: OutboundCallOptions): Promise<CallRecord> {
+  const twimlUrl = new URL(options.twimlUrl ?? `${BASE_URL}/calls/twiml/stream`);
+  if (options.nombre) twimlUrl.searchParams.set('nombre', options.nombre);
+  if (options.correo) twimlUrl.searchParams.set('correo', options.correo);
+
   const call = await twilioClient.calls.create({
     to: options.to,
     from: options.from ?? DEFAULT_FROM,
-    url: options.twimlUrl ?? `${BASE_URL}/calls/twiml/stream`,
+    url: twimlUrl.toString(),
     statusCallback: options.statusCallbackUrl ?? `${BASE_URL}/calls/status`,
     statusCallbackMethod: 'POST',
     record: options.record ?? false,

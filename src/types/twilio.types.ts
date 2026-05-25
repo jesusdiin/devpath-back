@@ -4,6 +4,8 @@ export interface OutboundCallOptions {
   twimlUrl?: string;
   statusCallbackUrl?: string;
   record?: boolean;
+  nombre?: string;
+  correo?: string;
 }
 
 export interface CallRecord {

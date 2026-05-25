@@ -50,6 +50,7 @@ export function handleMediaStream(twilioWs: WebSocket): void {
           (id) => { conversationId = id; },
           () => callSid,
           () => twilioEnded,
+          msg.start.customParameters,
         );
         break;
 
@@ -94,6 +95,7 @@ function openElevenLabsConnection(
   onConversationId: (id: string) => void,
   getCallSid: () => string | null,
   isTwilioEnded: () => boolean,
+  leadData: Record<string, string>,
 ): WebSocket {
   const elLog = createLogger('elevenlabs');
 
@@ -111,6 +113,7 @@ function openElevenLabsConnection(
         agent: { language: 'es' },
         tts: { optimize_streaming_latency: 3 },
       },
+      ...(Object.keys(leadData).length > 0 && { dynamic_variables: leadData }),
     };
     elLog.debug('sending init', init);
     ws.send(JSON.stringify(init));
@@ -192,7 +195,7 @@ function openElevenLabsConnection(
 
   ws.on('close', (code, reason) => {
     elLog.warn('WebSocket closed', { code, reason: reason.toString() });
-    if (!isTwilioEnded()) {
+    if (!isTwilioEnded() && transcript.length > 0) {
       const sid = getCallSid();
       if (sid) {
         twilioClient.calls(sid).update({ status: 'completed' })

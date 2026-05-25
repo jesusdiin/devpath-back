@@ -24,15 +24,22 @@ export function handleInbound(_req: Request, res: Response): void {
   res.type('text/xml').send(buildStreamTwiml());
 }
 
-export function getStreamTwiml(_req: Request, res: Response): void {
-  res.type('text/xml').send(buildStreamTwiml());
+export function getStreamTwiml(req: Request, res: Response): void {
+  const nombre = typeof req.query['nombre'] === 'string' ? req.query['nombre'] : undefined;
+  const correo = typeof req.query['correo'] === 'string' ? req.query['correo'] : undefined;
+  res.type('text/xml').send(buildStreamTwiml(nombre, correo));
 }
 
-function buildStreamTwiml(): string {
+function buildStreamTwiml(nombre?: string, correo?: string): string {
   const baseUrl = (process.env['TWILIO_BASE_URL'] ?? '').replace(/^https?:\/\//, '');
   const twiml = new twilio.twiml.VoiceResponse();
   const connect = twiml.connect();
-  connect.stream({ url: `wss://${baseUrl}/calls/stream` });
+  const stream = connect.stream({ url: `wss://${baseUrl}/calls/stream` });
+  if (nombre) {
+    stream.parameter({ name: 'nombre', value: nombre });
+    stream.parameter({ name: 'primer_nombre', value: nombre.split(' ')[0] ?? nombre });
+  }
+  if (correo) stream.parameter({ name: 'correo', value: correo });
   return twiml.toString();
 }
 
