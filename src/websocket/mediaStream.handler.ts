@@ -110,7 +110,10 @@ function openElevenLabsConnection(
     const init: ElevenLabsInitMessage = {
       type: 'conversation_initiation_client_data',
       conversation_config_override: {
-        agent: { language: 'es' },
+        agent: {
+          language: 'es',
+          tools: [{ type: 'system', name: 'end_call' }],
+        },
         tts: { optimize_streaming_latency: 3 },
       },
       ...(Object.keys(leadData).length > 0 && { dynamic_variables: leadData }),

@@ -1,7 +1,12 @@
 export interface ElevenLabsInitMessage {
   type: 'conversation_initiation_client_data';
   conversation_config_override: {
-    agent?: { language?: string; prompt?: { prompt?: string }; first_message?: string };
+    agent?: {
+      language?: string;
+      prompt?: { prompt?: string };
+      first_message?: string;
+      tools?: Array<{ type: string; name: string }>;
+    };
     tts?: { optimize_streaming_latency?: number };
   };
   dynamic_variables?: Record<string, string>;
