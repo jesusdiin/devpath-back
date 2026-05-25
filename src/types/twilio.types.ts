@@ -41,4 +41,5 @@ export interface CallAnalysis {
   cuando_empieza: 'este mes' | '1-3 meses' | 'solo explorando' | 'no contestó';
   mejor_horario: string | null;
   notas: string;
+  transcripcion: string;
 }

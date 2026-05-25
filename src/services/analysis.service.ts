@@ -67,6 +67,7 @@ export async function analyzeCall(conversationId: string, fallbackTranscript: Tr
       cuando_empieza: 'no contestó',
       mejor_horario: null,
       notas: 'La llamada no tuvo conversación registrada.',
+      transcripcion: '',
     };
   }
 
@@ -89,6 +90,7 @@ export async function analyzeCall(conversationId: string, fallbackTranscript: Tr
       .replace(/\s*```$/, '')
       .trim();
     const analysis = JSON.parse(raw) as CallAnalysis;
+    analysis.transcripcion = transcriptText;
     await postToWebhook(analysis);
     return analysis;
   } catch (err) {
@@ -99,6 +101,7 @@ export async function analyzeCall(conversationId: string, fallbackTranscript: Tr
       cuando_empieza: 'no contestó',
       mejor_horario: null,
       notas: 'Error al analizar la conversación.',
+      transcripcion: transcriptText,
     };
   }
 }
