@@ -22,6 +22,7 @@ export function handleMediaStream(twilioWs: WebSocket): void {
   let callSid: string | null = null;
   let conversationId: string | null = null;
   let twilioEnded = false;
+  let leadData: Record<string, string> = {};
   let elevenLabsWs: WebSocket | null = null;
   const transcript: TranscriptEntry[] = [];
 
@@ -42,6 +43,7 @@ export function handleMediaStream(twilioWs: WebSocket): void {
       case 'start':
         streamSid = msg.start.streamSid;
         callSid = msg.start.callSid;
+        leadData = msg.start.customParameters;
         log.info('twilio stream started', { streamSid, callSid, tracks: msg.start.tracks });
         elevenLabsWs = openElevenLabsConnection(
           twilioWs,
@@ -50,7 +52,7 @@ export function handleMediaStream(twilioWs: WebSocket): void {
           (id) => { conversationId = id; },
           () => callSid,
           () => twilioEnded,
-          msg.start.customParameters,
+          leadData,
         );
         break;
 
@@ -66,7 +68,7 @@ export function handleMediaStream(twilioWs: WebSocket): void {
         log.info('twilio stream stopped', { streamSid: msg.streamSid });
         twilioEnded = true;
         elevenLabsWs?.close();
-        analyzeCall(conversationId ?? '', transcript).then((analysis) => {
+        analyzeCall(conversationId ?? '', transcript, leadData).then((analysis) => {
           log.info('call analysis', {});
           console.log('[call analysis]\n' + JSON.stringify(analysis, null, 2));
         });

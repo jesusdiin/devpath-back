@@ -42,4 +42,7 @@ export interface CallAnalysis {
   mejor_horario: string | null;
   notas: string;
   transcripcion: string;
+  nombre: string;
+  correo: string;
+  telefono: string;
 }

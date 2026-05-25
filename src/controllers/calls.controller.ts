@@ -27,10 +27,11 @@ export function handleInbound(_req: Request, res: Response): void {
 export function getStreamTwiml(req: Request, res: Response): void {
   const nombre = typeof req.query['nombre'] === 'string' ? req.query['nombre'] : undefined;
   const correo = typeof req.query['correo'] === 'string' ? req.query['correo'] : undefined;
-  res.type('text/xml').send(buildStreamTwiml(nombre, correo));
+  const telefono = typeof req.query['telefono'] === 'string' ? req.query['telefono'] : undefined;
+  res.type('text/xml').send(buildStreamTwiml(nombre, correo, telefono));
 }
 
-function buildStreamTwiml(nombre?: string, correo?: string): string {
+function buildStreamTwiml(nombre?: string, correo?: string, telefono?: string): string {
   const baseUrl = (process.env['TWILIO_BASE_URL'] ?? '').replace(/^https?:\/\//, '');
   const twiml = new twilio.twiml.VoiceResponse();
   const connect = twiml.connect();
@@ -40,6 +41,7 @@ function buildStreamTwiml(nombre?: string, correo?: string): string {
     stream.parameter({ name: 'primer_nombre', value: nombre.split(' ')[0] ?? nombre });
   }
   if (correo) stream.parameter({ name: 'correo', value: correo });
+  if (telefono) stream.parameter({ name: 'telefono', value: telefono });
   return twiml.toString();
 }
 

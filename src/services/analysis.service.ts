@@ -48,7 +48,11 @@ async function fetchElevenLabsTranscript(conversationId: string): Promise<Transc
   return entries;
 }
 
-export async function analyzeCall(conversationId: string, fallbackTranscript: TranscriptEntry[]): Promise<CallAnalysis> {
+export async function analyzeCall(
+  conversationId: string,
+  fallbackTranscript: TranscriptEntry[],
+  leadData: Record<string, string> = {},
+): Promise<CallAnalysis> {
   let transcript = fallbackTranscript;
 
   if (conversationId) {
@@ -60,8 +64,15 @@ export async function analyzeCall(conversationId: string, fallbackTranscript: Tr
     }
   }
 
+  const lead = {
+    nombre: leadData['nombre'] ?? '',
+    correo: leadData['correo'] ?? '',
+    telefono: leadData['telefono'] ?? '',
+  };
+
   if (transcript.length === 0) {
     return {
+      ...lead,
       interesado: 'tal vez',
       presupuesto: 'no especificó',
       cuando_empieza: 'no contestó',
@@ -91,11 +102,13 @@ export async function analyzeCall(conversationId: string, fallbackTranscript: Tr
       .trim();
     const analysis = JSON.parse(raw) as CallAnalysis;
     analysis.transcripcion = transcriptText;
+    Object.assign(analysis, lead);
     await postToWebhook(analysis);
     return analysis;
   } catch (err) {
     log.error('failed to analyze call', { err });
     return {
+      ...lead,
       interesado: 'tal vez',
       presupuesto: 'no especificó',
       cuando_empieza: 'no contestó',
